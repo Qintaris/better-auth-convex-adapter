@@ -116,36 +116,36 @@ export function convexAdapter(config: ConvexAdapterConfig) {
     adapter: () => {
       const CRUD_PATH = 'betterAuthAdapter:crud'
 
-      const crud = (operation: string, payload: Record<string, unknown>) =>
+      const crud = async <T = unknown>(operation: string, payload: Record<string, unknown>) =>
         callConvexMutation(convexUrl, deployKey, CRUD_PATH, {
           operation,
           ...payload,
-        })
+        }) as Promise<T>
 
       return {
-        create: async ({ model, data }) =>
-          crud('create', { model, data }),
+        create: async <T extends Record<string, any>>({ model, data }: { model: string; data: T }) =>
+          crud<T>('create', { model, data }),
 
-        findOne: async ({ model, where, select }) =>
-          crud('findOne', { model, where, select }),
+        findOne: async <T>({ model, where, select }: any) =>
+          crud<T | null>('findOne', { model, where, select }),
 
-        findMany: async ({ model, where, limit, sortBy, offset }) =>
-          crud('findMany', { model, where, limit, sortBy, offset }),
+        findMany: async <T>({ model, where, limit, sortBy, offset }: any) =>
+          crud<T[]>('findMany', { model, where, limit, sortBy, offset }),
 
-        update: async ({ model, where, update }) =>
-          crud('update', { model, where, data: update }),
+        update: async <T>({ model, where, update }: any) =>
+          crud<T | null>('update', { model, where, data: update }),
 
-        updateMany: async ({ model, where, update }) =>
-          crud('updateMany', { model, where, data: update }),
+        updateMany: async ({ model, where, update }: any) =>
+          crud<number>('updateMany', { model, where, data: update }),
 
-        delete: async ({ model, where }) =>
-          crud('delete', { model, where }),
+        delete: async ({ model, where }: any) =>
+          crud<void>('delete', { model, where }),
 
-        deleteMany: async ({ model, where }) =>
-          crud('deleteMany', { model, where }),
+        deleteMany: async ({ model, where }: any) =>
+          crud<number>('deleteMany', { model, where }),
 
-        count: async ({ model, where }) =>
-          crud('count', { model, where }),
+        count: async ({ model, where }: any) =>
+          crud<number>('count', { model, where }),
       }
     },
   })

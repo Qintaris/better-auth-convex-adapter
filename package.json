@@ -9,10 +9,6 @@
     ".": {
       "import": "./dist/adapter.js",
       "types": "./dist/adapter.d.ts"
-    },
-    "./convex": {
-      "import": "./dist/convex/auth.js",
-      "types": "./dist/convex/auth.d.ts"
     }
   },
   "files": [

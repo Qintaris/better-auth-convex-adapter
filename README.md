@@ -99,7 +99,7 @@ export default defineSchema({
 
 ### 3. Deploy the Convex auth function
 
-Copy `src/convex/auth.ts` from this package (or [from GitHub](https://github.com/Qintaris/better-auth-convex-adapter/blob/main/src/convex/auth.ts)) to your `convex/` directory:
+Copy `src/convex/auth.ts` from this package (or [from GitHub](https://github.com/Qintaris/better-auth-convex-adapter/blob/main/src/convex/auth.ts)) to your `convex/` directory. This file is a Convex project source file, not a compiled package export, because it imports your local `convex/_generated/server` module:
 
 ```bash
 cp node_modules/better-auth-convex-adapter/src/convex/auth.ts convex/authAdapter.ts
@@ -208,6 +208,12 @@ But if you're already on Convex and want fewer moving parts, this adapter gives 
 - **One deployment** — auth data is backed up alongside app data, same CI/CD, same dashboard
 - **One billing** — no separate database to provision or monitor
 - **Same DX** — you already know how to query and mutate Convex data
+
+## Support
+
+If this adapter saves you time, you can support the project with a donation:
+
+[Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=95T36AZHYRJ82)
 
 ## License
 

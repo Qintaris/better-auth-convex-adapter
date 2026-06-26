@@ -99,6 +99,7 @@ function findBestIndex(
 
 function buildFilterPredicate(where: WhereClause[]) {
   return (q: any) => {
+    const predicates = []
     for (let i = 0; i < where.length; i++) {
       const clause = where[i]
       const op = clause.operator || 'eq'
@@ -140,10 +141,11 @@ function buildFilterPredicate(where: WhereClause[]) {
         default:
           pred = q.eq(q.field(clause.field), clause.value)
       }
-
-      if (i === 0) continue
-      return q.and(pred)
+      predicates.push(pred)
     }
+    if (predicates.length === 0) return q.eq(q.field('id'), '__never__')
+    if (predicates.length === 1) return predicates[0]
+    return q.and(...predicates)
   }
 }
 
