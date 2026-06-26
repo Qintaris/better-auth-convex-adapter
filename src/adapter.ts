@@ -44,8 +44,7 @@ async function callConvexMutation(
   })
 
   if (!response.ok) {
-    const text = await response.text()
-    throw new Error(`Convex mutation failed (${response.status}): ${text}`)
+    throw new Error(`Convex mutation failed with HTTP ${response.status}`)
   }
 
   const result = (await response.json()) as {
@@ -55,7 +54,7 @@ async function callConvexMutation(
   }
 
   if (result.status === 'error') {
-    throw new Error(`Convex mutation error: ${result.errorMessage}`)
+    throw new Error(`Convex mutation error: ${sanitizeConvexError(result.errorMessage)}`)
   }
 
   return result.value
@@ -87,6 +86,9 @@ async function callConvexMutation(
 export function convexAdapter(config: ConvexAdapterConfig) {
   const { convexUrl, deployKey } = config
 
+  if (typeof window !== 'undefined') {
+    throw new Error('ConvexAdapter must run on the server. Never bundle CONVEX_DEPLOY_KEY into browser code.')
+  }
   if (!convexUrl || !deployKey) {
     throw new Error(
       'ConvexAdapter: convexUrl and deployKey are required.\n' +
@@ -94,6 +96,7 @@ export function convexAdapter(config: ConvexAdapterConfig) {
       '  deployKey → your Convex deploy key (e.g. CONVEX_DEPLOY_KEY)',
     )
   }
+  validateConvexConfig(convexUrl, deployKey)
 
   return createAdapterFactory({
     config: {
@@ -149,4 +152,26 @@ export function convexAdapter(config: ConvexAdapterConfig) {
       }
     },
   })
+}
+
+function validateConvexConfig(convexUrl: string, deployKey: string) {
+  let parsed: URL
+  try {
+    parsed = new URL(convexUrl)
+  } catch {
+    throw new Error('ConvexAdapter: convexUrl must be a valid URL')
+  }
+  if (parsed.protocol !== 'https:') {
+    throw new Error('ConvexAdapter: convexUrl must use https')
+  }
+  if (!deployKey.startsWith('prod:') && !deployKey.startsWith('dev:')) {
+    throw new Error('ConvexAdapter: deployKey must look like a Convex deploy key')
+  }
+}
+
+function sanitizeConvexError(message: string | undefined) {
+  if (!message) return 'unknown error'
+  return message
+    .replace(/Convex\s+[A-Za-z0-9._~+/=:-]+/g, 'Convex [redacted]')
+    .replace(/(prod|dev):[A-Za-z0-9._~+/=|:-]+/g, '$1:[redacted]')
 }

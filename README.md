@@ -151,7 +151,7 @@ VITE_CONVEX_URL=https://your-project.convex.cloud
 CONVEX_DEPLOY_KEY=prod:your-project|base64key
 ```
 
-**Important:** `CONVEX_DEPLOY_KEY` must have **admin privileges** so the adapter can call Convex mutations from your server.
+**Important:** `CONVEX_DEPLOY_KEY` must have **admin privileges** so the adapter can call Convex mutations from your server. Never expose it to browser/client code.
 
 ## How it works
 
@@ -197,7 +197,7 @@ Creates a Better Auth database adapter.
 ## Caveats
 
 - **Convex mutations have a 5-second timeout.** Auth operations are fast (single document reads/writes) so this is rarely an issue, but be aware for bulk operations or large deployments.
-- **`CONVEX_DEPLOY_KEY` is sensitive.** Treat it like a database password. Use environment-specific keys (dev vs. prod), never commit it to source control.
+- **`CONVEX_DEPLOY_KEY` is sensitive.** Treat it like a database password. Use environment-specific keys (dev vs. prod), never commit it to source control, and never expose it through `NEXT_PUBLIC_*`, `VITE_*`, or any other client-side environment variable.
 
 ## Why not the Kysely adapter + a separate SQL database?
 
